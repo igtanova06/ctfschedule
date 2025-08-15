@@ -5,299 +5,572 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lịch Thi CTF - PurifyingBlade</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Creepster:wght@400&family=Metal+Mania:wght@400&family=Nosifer:wght@400&family=Butcherman:wght@400&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    
     :root{
-      --bg:#f4f7f9; --card:#fff; --text:#2c3e50; --muted:#556; --line:#e6e6e6;
-      --grad1:#6a11cb; --grad2:#2575fc;
-      --chip-up:#3498db; --chip-on:#2ecc71; --chip-done:#95a5a6; --chip-unk:#8e44ad;
-      --chip-type:#ff8c00;
-      --btn:#2575fc; --btn-text:#fff;
-    }
-    [data-theme="dark"]{
-      --bg:#0f141b; --card:#121a22; --text:#e9eef6; --muted:#aab2bd; --line:#263241;
-      --grad1:#3a0ca3; --grad2:#4361ee;
-      --chip-up:#2980b9; --chip-on:#27ae60; --chip-done:#7f8c8d; --chip-unk:#9b59b6;
-      --chip-type:#e67e22;
-      --btn:#3b82f6; --btn-text:#fff;
+      --bg: radial-gradient(ellipse at center, #0a0000 0%, #000000 100%);
+      --card: rgba(15, 0, 0, 0.95);
+      --text: #ffffff;
+      --text-secondary: #cccccc;
+      --red-accent: #ff0040;
+      --dark-red: #8B0000;
+      --blood-red: #DC143C;
+      --blade-silver: #c0c0c0;
+      --border: rgba(255, 0, 64, 0.3);
+      --glow: rgba(255, 255, 255, 0.4);
+      --red-glow: rgba(255, 0, 64, 0.6);
+      --blood-glow: rgba(220, 20, 60, 0.8);
+      --shadow: rgba(0, 0, 0, 0.9);
+      --blood: #8B0000;
     }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0; padding:24px; min-height:100vh;
-      display:flex; justify-content:center; align-items:flex-start;
-      background:var(--bg); color:var(--text); font-family:ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0; 
+      padding: 0; 
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
     }
-    .container{
-      width:100%; max-width:1100px; background:var(--card);
-      border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08); overflow:hidden;
-      border:1px solid var(--line);
+
+    /* Enhanced Matrix rain with blood particles */
+    .matrix-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -1;
+      opacity: 0.12;
+      pointer-events: none;
     }
-    .hero{
-      padding:28px 24px;
-      background:linear-gradient(135deg, var(--grad1), var(--grad2));
-      color:white; position:relative;
+
+    .blood-drops {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -2;
+      pointer-events: none;
+      overflow: hidden;
     }
-    .hero h1{ margin:0 0 6px; font-size:28px; font-weight:800; letter-spacing:.3px }
-    .hero p{ margin:0; opacity:.92 }
-    .controls{
-      display:flex; gap:12px; flex-wrap:wrap; margin-top:14px
+
+    .blood-drop {
+      position: absolute;
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(180deg, var(--blood-red) 0%, var(--dark-red) 50%, rgba(139, 0, 0, 0) 100%);
+      border-radius: 0 0 50% 50%;
+      animation: bloodFall linear infinite;
+      opacity: 0.8;
+      filter: blur(0.5px);
     }
-    .chip{
-      display:inline-flex; align-items:center; gap:8px; padding:8px 12px;
-      background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
-      color:#fff; border-radius:999px; font-weight:600; font-size:13px; cursor:default;
-      user-select:none; backdrop-filter: blur(4px);
+
+    @keyframes bloodFall {
+      0% { transform: translateY(-100px); opacity: 0; }
+      15% { opacity: 0.8; }
+      85% { opacity: 0.8; }
+      100% { transform: translateY(100vh); opacity: 0; }
     }
-    .toolbar{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      padding:14px 18px; border-bottom:1px solid var(--line); background:linear-gradient(180deg, rgba(0,0,0,0.00), rgba(0,0,0,0.02));
-      flex-wrap:wrap;
+
+    /* Enhanced blade with more blood effects */
+    .hero-blade {
+      position: absolute;
+      top: 50%;
+      right: -30px;
+      transform: translateY(-50%) rotate(45deg);
+      width: 200px;
+      height: 16px;
+      background: linear-gradient(90deg, var(--blade-silver) 0%, #ffffff 50%, var(--blade-silver) 100%);
+      box-shadow: 
+        0 0 30px var(--glow), 
+        0 0 60px var(--red-glow),
+        0 0 90px var(--blood-glow),
+        inset 0 0 10px rgba(255, 255, 255, 0.3);
+      opacity: 0.9;
+      border-radius: 8px;
     }
-    .left-tools, .right-tools{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-    .btn{
-      appearance:none; border:none; border-radius:12px; padding:10px 14px;
-      background:var(--btn); color:var(--btn-text); font-weight:700; cursor:pointer;
-      transition:transform .05s ease, filter .15s ease;
+
+    .hero-blade::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: 25%;
+      width: 10px;
+      height: 30px;
+      background: linear-gradient(180deg, var(--blood-red) 0%, var(--dark-red) 70%, rgba(139, 0, 0, 0) 100%);
+      border-radius: 0 0 50% 50%;
+      animation: bloodDrip 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 5px var(--blood-red));
     }
-    .btn:active{ transform:translateY(1px) }
-    .ghost{
-      background:transparent; color:var(--text); border:1px solid var(--line)
+
+    .hero-blade::after {
+      content: '';
+      position: absolute;
+      top: -18px;
+      left: 65%;
+      width: 8px;
+      height: 35px;
+      background: linear-gradient(180deg, var(--blood-red) 0%, var(--dark-red) 60%, rgba(139, 0, 0, 0) 100%);
+      border-radius: 0 0 50% 50%;
+      animation: bloodDrip 3.5s ease-in-out infinite 1s;
+      filter: drop-shadow(0 0 3px var(--blood-red));
     }
-    .filter{
-      padding:9px 12px; border-radius:10px; border:1px solid var(--line);
-      background:transparent; color:var(--text)
+
+    @keyframes bloodDrip {
+      0%, 85% { opacity: 0; transform: translateY(-15px) scaleY(0.3); }
+      15% { opacity: 1; transform: translateY(0) scaleY(1); }
+      100% { opacity: 0; transform: translateY(60px) scaleY(2); }
     }
-    .table-wrap{ overflow:auto; }
-    table{ width:100%; border-collapse:collapse; }
-    thead th{
-      position:sticky; top:0; z-index:1;
-      background:linear-gradient(0deg, rgba(0,0,0,0.00), rgba(0,0,0,0.03));
-      backdrop-filter: blur(3px);
-      text-align:left; padding:14px 16px; font-weight:700; color:var(--muted); border-bottom:1px solid var(--line);
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
     }
-    tbody td{
-      padding:14px 16px; border-bottom:1px solid var(--line); vertical-align:middle;
+
+    .hero {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(30, 0, 0, 0.95) 50%, rgba(15, 0, 0, 0.98) 100%);
+      border: 3px solid var(--red-accent);
+      border-radius: 12px;
+      padding: 50px 40px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        0 0 40px var(--red-glow),
+        0 0 80px var(--blood-glow),
+        inset 0 0 40px rgba(0, 0, 0, 0.9),
+        inset 0 0 80px rgba(139, 0, 0, 0.1);
     }
-    tbody tr:hover{ background:rgba(0,0,0,.03) }
-    .status{
-      display:inline-block; padding:6px 12px; border-radius:999px; font-weight:800; font-size:12px; color:#fff; letter-spacing:.2px
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255, 0, 64, 0.05) 3px, rgba(255, 0, 64, 0.05) 6px),
+        repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(220, 20, 60, 0.02) 50px, rgba(220, 20, 60, 0.02) 52px);
+      pointer-events: none;
+      animation: subtleShift 10s ease-in-out infinite;
     }
-    .status.upcoming{ background:var(--chip-up) }
-    .status.ongoing{ background:var(--chip-on) }
-    .status.finished{ background:var(--chip-done) }
-    .status.unknown{ background:var(--chip-unk) }
-    .type{
-      display:inline-block; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px; color:#fff; background:var(--chip-type)
+
+    @keyframes subtleShift { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+
+    .hero h1 {
+      margin: 0 0 20px;
+      font-family: 'Metal Mania', 'Butcherman', cursive;
+      font-size: 48px;
+      font-weight: 400;
+      color: var(--text);
+      text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.6),
+        0 0 20px var(--red-glow),
+        0 0 40px var(--blood-glow),
+        2px 2px 0px var(--dark-red),
+        4px 4px 0px rgba(0, 0, 0, 0.5);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      filter: drop-shadow(0 0 10px var(--red-accent));
     }
-    .title{
-      font-weight:800; font-size:15px; line-height:1.2;
+
+    .hero p {
+      margin: 0 0 25px;
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.7;
+      text-shadow: 
+        0 0 8px rgba(255, 255, 255, 0.3),
+        0 0 15px rgba(255, 0, 64, 0.2);
+      font-family: 'Inter', sans-serif;
     }
-    .subtle{ color:var(--muted); font-size:12px }
-    .link-btn{
-      display:inline-flex; align-items:center; gap:8px; text-decoration:none;
-      background:transparent; border:1px solid var(--line); padding:8px 12px; border-radius:10px; font-weight:700; color:var(--text)
+
+    .controls { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 25px; }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px;
+      background: linear-gradient(135deg, rgba(255, 0, 64, 0.15) 0%, rgba(139, 0, 0, 0.2) 100%);
+      border: 2px solid rgba(255, 0, 64, 0.4);
+      color: var(--text); border-radius: 25px; font-weight: 700; font-size: 15px;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      box-shadow: 0 0 15px rgba(255, 0, 64, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.08);
+      animation: pulseChip 3s infinite alternate; font-family: 'Inter', sans-serif;
     }
-    .pill{
-      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; border:1px solid var(--line); font-size:12px; color:var(--muted);
+    @keyframes pulseChip {
+      0% { box-shadow: 0 0 10px rgba(255, 0, 64, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.05); transform: scale(1); }
+      100% { box-shadow: 0 0 25px rgba(255, 0, 64, 0.6), inset 0 0 25px rgba(255, 255, 255, 0.15); transform: scale(1.02); }
     }
-    @media (max-width: 760px){
-      .toolbar{ padding:12px }
-      thead{ display:none }
-      table, tbody, tr, td{ display:block; width:100% }
-      tbody tr{ border-bottom:1px solid var(--line) }
-      tbody td{ border:none; padding:10px 16px }
-      tbody td::before{
-        content:attr(data-label); display:block; font-weight:700; color:var(--muted); margin-bottom:6px
+
+    .toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 25px 30px; background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(15, 0, 0, 0.85) 100%);
+      border: 2px solid var(--border); border-radius: 12px; margin-bottom: 25px;
+      backdrop-filter: blur(15px); flex-wrap: wrap; gap: 20px;
+      box-shadow: 0 0 25px rgba(255, 0, 64, 0.2), inset 0 0 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .left-tools, .right-tools { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+
+    .filter, .btn {
+      padding: 15px 22px; background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(15, 0, 0, 0.8) 100%);
+      border: 2px solid rgba(255, 0, 64, 0.4); color: var(--text); border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; text-transform: uppercase;
+      cursor: pointer; transition: all 0.4s ease; box-shadow: 0 0 10px rgba(255, 0, 64, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.05);
+      letter-spacing: 1px;
+    }
+    .btn { font-weight: 800; letter-spacing: 1.2px; }
+    .filter:hover, .btn:hover {
+      background: linear-gradient(135deg, rgba(255, 0, 64, 0.2) 0%, rgba(139, 0, 0, 0.3) 100%);
+      box-shadow: 0 0 25px rgba(255, 0, 64, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.1);
+      transform: translateY(-3px) scale(1.02); border-color: var(--red-accent);
+    }
+
+    .table-container {
+      background: linear-gradient(135deg, var(--card) 0%, rgba(20, 0, 0, 0.98) 100%);
+      border: 2px solid var(--border); border-radius: 12px; overflow: hidden;
+      box-shadow: 0 15px 40px var(--shadow), 0 0 30px rgba(255, 0, 64, 0.15), inset 0 0 30px rgba(0, 0, 0, 0.3);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 17px; }
+    thead th {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 0, 0, 0.9) 100%);
+      text-align: left; padding: 25px 25px; font-family: 'Metal Mania', 'Inter', sans-serif; font-weight: 400; color: var(--text);
+      border-bottom: 3px solid var(--red-accent); text-transform: uppercase; letter-spacing: 1.5px; font-size: 18px;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 0, 64, 0.3);
+      box-shadow: inset 0 -3px 15px rgba(255, 0, 64, 0.2);
+    }
+    tbody td {
+      padding: 22px 25px; border-bottom: 1px solid rgba(255, 0, 64, 0.1); vertical-align: middle;
+      background: rgba(0, 0, 0, 0.4); font-size: 16px; transition: all 0.3s ease;
+    }
+    tbody tr:hover {
+      background: linear-gradient(135deg, rgba(255, 0, 64, 0.08) 0%, rgba(139, 0, 0, 0.12) 100%);
+      box-shadow: inset 0 0 25px rgba(255, 0, 64, 0.15), 0 0 15px rgba(255, 0, 64, 0.2);
+      transform: scale(1.01);
+    }
+    tbody tr:nth-child(even) { background: rgba(5, 0, 0, 0.6); }
+    tbody tr:nth-child(even):hover {
+      background: linear-gradient(135deg, rgba(255, 0, 64, 0.1) 0%, rgba(139, 0, 0, 0.15) 100%);
+    }
+
+    .status {
+      display: inline-block; padding: 10px 20px; border-radius: 25px; font-weight: 800; font-size: 13px;
+      text-transform: uppercase; letter-spacing: 1px; border: 2px solid; text-shadow: 0 0 8px rgba(0,0,0,0.8);
+      font-family: 'Inter', sans-serif;
+    }
+    .status.upcoming {
+      background: linear-gradient(135deg, rgba(0, 123, 255, 0.25) 0%, rgba(0, 100, 200, 0.3) 100%);
+      color: #00bfff; border-color: #00bfff; box-shadow: 0 0 15px rgba(0, 191, 255, 0.4);
+    }
+    .status.ongoing {
+      background: linear-gradient(135deg, rgba(40, 167, 69, 0.3) 0%, rgba(30, 140, 50, 0.4) 100%);
+      color: #00ff41; border-color: #00ff41; box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+      animation: liveBlink 1.5s infinite alternate;
+    }
+    .status.finished {
+      background: linear-gradient(135deg, rgba(108, 117, 125, 0.25) 0%, rgba(80, 90, 95, 0.3) 100%);
+      color: #888; border-color: #888;
+    }
+    .status.unknown {
+      background: linear-gradient(135deg, rgba(255, 0, 64, 0.3) 0%, rgba(139, 0, 0, 0.4) 100%);
+      color: var(--red-accent); border-color: var(--red-accent);
+      box-shadow: 0 0 20px var(--red-glow); animation: unknownPulse 2s infinite alternate;
+    }
+    @keyframes liveBlink { 0% { opacity: .8; transform: scale(1);} 100% {opacity:1; transform: scale(1.05);} }
+    @keyframes unknownPulse { 0% { box-shadow: 0 0 15px var(--red-glow); opacity: .9;} 100% { box-shadow: 0 0 30px var(--blood-glow); opacity:1;} }
+
+    .type {
+      display: inline-block; padding: 10px 20px; border-radius: 25px; font-weight: 800; font-size: 13px;
+      text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(135deg, rgba(255, 140, 0, 0.25) 0%, rgba(200, 100, 0, 0.3) 100%);
+      color: #ffaa00; border: 2px solid #ffaa00; box-shadow: 0 0 12px rgba(255, 170, 0, 0.4); font-family: 'Inter', sans-serif;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    }
+
+    .title {
+      font-family: 'Butcherman', 'Inter', sans-serif; font-weight: 400; font-size: 20px; color: var(--text);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 0, 64, 0.2);
+      margin-bottom: 6px; letter-spacing: 1px;
+    }
+    .subtle { color: var(--text-secondary); font-size: 12px; font-style: italic; text-shadow: 0 0 5px rgba(255, 0, 64, 0.3); }
+
+    .link-btn {
+      display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(15, 0, 0, 0.8) 100%);
+      border: 2px solid rgba(255, 0, 64, 0.4); padding: 12px 20px; border-radius: 8px; font-weight: 800; color: var(--text);
+      font-size: 14px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.4s ease;
+      box-shadow: 0 0 10px rgba(255, 0, 64, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.05); font-family: 'Inter', sans-serif;
+    }
+    .link-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 0, 64, 0.2) 0%, rgba(139, 0, 0, 0.3) 100%);
+      box-shadow: 0 0 25px rgba(255, 0, 64, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px) scale(1.03); border-color: var(--red-accent);
+    }
+
+    /* Glitch effect */
+    .glitch { position: relative; animation: glitchMain 4s infinite; }
+    .glitch::before, .glitch::after { content: attr(data-text); position: absolute; top:0; left:0; width:100%; height:100%; }
+    .glitch::before { animation: glitchBefore 3s infinite; color:#ff0040; z-index:-1; }
+    .glitch::after { animation: glitchAfter 2s infinite; color:#00ffff; z-index:-2; }
+    @keyframes glitchMain { 0%,100%{transform:translate(0)} 20%{transform:translate(-2px,2px)} 40%{transform:translate(-2px,-2px)} 60%{transform:translate(2px,2px)} 80%{transform:translate(2px,-2px)} }
+    @keyframes glitchBefore { 0%,100%{transform:translate(0)} 15%{transform:translate(-3px,-2px)} 30%{transform:translate(3px,2px)} 45%{transform:translate(-1px,-1px)} 60%{transform:translate(1px,2px)} 75%{transform:translate(-2px,1px)} }
+    @keyframes glitchAfter { 0%,100%{transform:translate(0)} 20%{transform:translate(2px,0)} 40%{transform:translate(-2px,0)} 60%{transform:translate(0,2px)} 80%{transform:translate(0,-2px)} }
+
+    /* Blood splatter effects */
+    .blood-splatter { position: absolute; pointer-events: none; opacity: 0.3; }
+    .blood-splatter::before { content: '💧'; font-size: 20px; color: var(--blood-red); animation: splatterFade 5s infinite; }
+    @keyframes splatterFade { 0%, 90% { opacity: 0; } 10% { opacity: 0.6; } 100% { opacity: 0; } }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 32px; }
+      .hero p { font-size: 18px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .left-tools, .right-tools { justify-content: center; }
+      thead { display: none; }
+      table, tbody, tr, td { display: block; width: 100%; }
+      tbody tr { border: 2px solid var(--border); border-radius: 12px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 0 15px rgba(255, 0, 64, 0.2); }
+      tbody td { border: none; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; }
+      tbody td::before {
+        content: attr(data-label); font-weight: 800; color: var(--text); text-transform: uppercase; font-size: 13px; font-family: 'Inter', sans-serif;
+        text-shadow: 0 0 5px rgba(255, 0, 64, 0.3);
       }
     }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.5); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--red-accent) 0%, var(--dark-red) 100%); border-radius: 6px; box-shadow: 0 0 8px rgba(255, 0, 64, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.2); }
+    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--blood-red) 0%, var(--red-accent) 100%); box-shadow: 0 0 15px var(--blood-glow), inset 0 0 8px rgba(255, 255, 255, 0.3); }
   </style>
 </head>
-<body data-theme="light">
+<body>
+  <div class="matrix-bg" id="matrix"></div>
+  <div class="blood-drops" id="bloodDrops"></div>
+  
   <div class="container">
     <div class="hero">
-      <h1>🗓️ Lịch Thi CTF • PurifyingBlade</h1>
-      <p>Danh sách sự kiện CTF sắp tới (ICT, Asia/Ho_Chi_Minh). Sự kiện thiếu ngày sẽ hiển thị là <b>“Chưa công bố”</b>.</p>
+      <div class="hero-blade"></div>
+      <h1 class="glitch" data-text="⚔️ PURIFYING BLADE CTF SCHEDULE">⚔️ PURIFYING BLADE CTF SCHEDULE</h1>
+      <p>[ CLASSIFIED ] Danh sách sự kiện CTF sắp tới (ICT, Asia/Ho_Chi_Minh). <br>
+         Sự kiện thiếu thông tin sẽ hiển thị trạng thái <span style="color: var(--red-accent); text-shadow: 0 0 10px var(--red-glow);">"UNKNOWN"</span>.</p>
       <div class="controls">
-        <span class="chip">⏱️ ICT (UTC+7)</span>
-        <span class="chip">⚔️ A/D &amp; Jeopardy</span>
-        <span class="chip">✨ Tự động phân loại trạng thái</span>
+        <span class="chip">⏱️ UTC+7 TIMEZONE</span>
+        <span class="chip">🔥 A/D & JEOPARDY</span>
+        <span class="chip">🤖 AUTO STATUS</span>
+        <span class="chip">🏴‍☠️ HACKER MODE</span>
       </div>
     </div>
 
     <div class="toolbar">
       <div class="left-tools">
         <select id="typeFilter" class="filter" title="Lọc theo thể loại">
-          <option value="all">Tất cả thể loại</option>
-          <option value="Jeopardy">Jeopardy</option>
-          <option value="Attack/Defense">Attack/Defense</option>
-          <option value="unknown">Chưa rõ</option>
+          <option value="all">[ ALL TYPES ]</option>
+          <option value="Jeopardy">[ JEOPARDY ]</option>
+          <option value="Attack/Defense">[ ATTACK/DEFENSE ]</option>
+          <option value="unknown">[ UNKNOWN ]</option>
         </select>
-        <button id="sortBtn" class="btn ghost">Sắp xếp theo thời gian</button>
+        <button id="sortBtn" class="btn">⏰ SORT BY TIME</button>
       </div>
       <div class="right-tools">
-        <button id="themeBtn" class="btn">Dark / Light</button>
+        <button id="refreshBtn" class="btn">🔄 REFRESH</button>
       </div>
     </div>
 
-    <div class="table-wrap" id="schedule-container"></div>
+    <div class="table-container">
+      <div id="schedule-container"></div>
+    </div>
   </div>
 
   <script>
-  // ======== DỮ LIỆU (giữ format như bạn đang dùng) ========
-  const lichThi = [
-    {
-      ten: "SekaiCTF 2025",
-      batDau: "2025-08-16T08:00:00",
-      ketThuc: "2025-08-18T08:00:00",
-      loai: "Jeopardy",
-      link: "https://ctf.sekai.team/"
-    },
-    {
-      ten: "DDCCTF 2025",
-      batDau: "",
-      ketThuc: "",
-      loai: "Jeopardy",
-      link: ""
-    },
-    {
-      ten: "Full Weak Engineer CTF 2025",
-      batDau: "2025-08-29T17:00:00",
-      ketThuc: "2025-08-31T17:00:00",
-      loai: "Jeopardy",
-      link: "https://ctf.fwectf.com/"
-    },
-    {
-      ten: "HOLACTF 2025",
-      batDau: "2025-08-30T00:00:00",
-      ketThuc: "2025-08-31T23:59:59",
-      loai: "Jeopardy",
-      link: ""
-    },
-    {
-      ten: "FHacker CTF 2025 - Thi thử",
-      batDau: "2025-08-25T00:00:00",
-      ketThuc: "2025-08-25T23:59:59",
-      loai: "Attack/Defense",
-      link: ""
-    },
-    {
-      ten: "FHacker CTF 2025 - Thi chính thức",
-      batDau: "2025-09-06T00:00:00",
-      ketThuc: "2025-09-06T23:59:59",
-      loai: "Attack/Defense",
-      link: ""
+    // ===== Matrix rain effect =====
+    function createMatrix() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const mount = document.getElementById('matrix');
+      mount.innerHTML = '';
+      mount.appendChild(canvas);
+      
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()♠♣♦♥⚡⚔️💀";
+      const columns = Math.floor(canvas.width / 15);
+      const drops = new Array(columns).fill(1);
+
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ff0040';
+        ctx.font = '12px JetBrains Mono';
+
+        for (let i = 0; i < drops.length; i++) {
+          const text = charset[Math.floor(Math.random() * charset.length)];
+          ctx.globalAlpha = Math.random();
+          ctx.fillText(text, i * 15, drops[i] * 15);
+
+          if (drops[i] * 15 > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
     }
-  ];
 
-  // ======== HỖ TRỢ THỜI GIAN / TRẠNG THÁI ========
-  const tzOpts = {year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Ho_Chi_Minh'};
-  const fmt = new Intl.DateTimeFormat('vi-VN', tzOpts);
-  const now = new Date();
+    // ===== Blood drops background =====
+    function createBloodDrops(count = 60) {
+      const wrap = document.getElementById('bloodDrops');
+      wrap.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const d = document.createElement('div');
+        d.className = 'blood-drop';
+        d.style.left = Math.random() * 100 + 'vw';
+        d.style.animationDuration = (3 + Math.random() * 5) + 's';
+        d.style.animationDelay = (Math.random() * 5) + 's';
+        d.style.height = (10 + Math.random() * 30) + 'px';
+        wrap.appendChild(d);
+      }
+    }
 
-  function parseDateSafe(s){
-    if(!s || typeof s !== 'string' || !s.trim()) return null;
-    const d = new Date(s);
-    return isNaN(d.getTime()) ? null : d;
-  }
-  function getStatus(start, end){
-    if(!start || !end) return {label:'Không rõ', cls:'unknown'};
-    if(now < start) return {label:'Sắp diễn ra', cls:'upcoming'};
-    if(now >= start && now <= end) return {label:'Đang diễn ra', cls:'ongoing'};
-    return {label:'Đã kết thúc', cls:'finished'};
-  }
-  function sortByTime(a, b){
-    const sa = parseDateSafe(a.batDau), sb = parseDateSafe(b.batDau);
-    if(!sa && !sb) return 0;
-    if(!sa) return 1;      // đẩy sự kiện chưa rõ ngày xuống cuối
-    if(!sb) return -1;
-    return sa - sb;
-  }
+    // ===== DATA (đã bỏ UIT-CTF, SVATTT, Imaginary CTF) =====
+    const lichThi = [
+      {
+        ten: "SekaiCTF 2025",
+        batDau: "2025-08-16T08:00:00",
+        ketThuc: "2025-08-18T08:00:00",
+        loai: "Jeopardy",
+        link: "https://ctf.sekai.team/"
+      },
+      {
+        ten: "DDCCTF 2025",
+        batDau: "",
+        ketThuc: "",
+        loai: "Jeopardy",
+        link: ""
+      },
+      {
+        ten: "Full Weak Engineer CTF 2025",
+        batDau: "2025-08-29T17:00:00",
+        ketThuc: "2025-08-31T17:00:00",
+        loai: "Jeopardy",
+        link: "https://ctf.fwectf.com/"
+      },
+      {
+        ten: "HOLACTF 2025",
+        batDau: "2025-08-30T00:00:00",
+        ketThuc: "2025-08-31T23:59:59",
+        loai: "Jeopardy",
+        link: ""
+      },
+      {
+        ten: "FHacker CTF 2025 - Thi thử",
+        batDau: "2025-08-25T00:00:00",
+        ketThuc: "2025-08-25T23:59:59",
+        loai: "Attack/Defense",
+        link: ""
+      },
+      {
+        ten: "FHacker CTF 2025 - Thi chính thức",
+        batDau: "2025-09-06T00:00:00",
+        ketThuc: "2025-09-06T23:59:59",
+        loai: "Attack/Defense",
+        link: ""
+      }
+    ];
 
-  // ======== RENDER ========
-  let sortedAsc = true;
+    // ===== Time helpers & rendering =====
+    const tzOpts = {year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Ho_Chi_Minh'};
+    const fmt = new Intl.DateTimeFormat('vi-VN', tzOpts);
+    let sortedAsc = true;
 
-  function render(){
-    const typeFilter = document.getElementById('typeFilter').value;
-    const container = document.getElementById('schedule-container');
+    function parseDateSafe(s){
+      if(!s || typeof s !== 'string' || !s.trim()) return null;
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    function getStatus(start, end){
+      const now = new Date();
+      if(!start || !end) return {label:'Không rõ', cls:'unknown'};
+      if(now < start) return {label:'Sắp diễn ra', cls:'upcoming'};
+      if(now >= start && now <= end) return {label:'Đang diễn ra', cls:'ongoing'};
+      return {label:'Đã kết thúc', cls:'finished'};
+    }
+    function sortByTime(a, b){
+      const sa = parseDateSafe(a.batDau), sb = parseDateSafe(b.batDau);
+      if(!sa && !sb) return 0;
+      if(!sa) return 1; // đẩy event không có ngày xuống cuối
+      if(!sb) return -1;
+      return sa - sb;
+    }
 
-    // sắp xếp
-    const data = [...lichThi].sort(sortByTime);
-    if(!sortedAsc) data.reverse();
+    function render(){
+      const typeFilter = document.getElementById('typeFilter').value;
+      const container = document.getElementById('schedule-container');
 
-    // lọc
-    const filtered = data.filter(e=>{
-      const t = (e.loai || '').trim() || 'unknown';
-      return typeFilter === 'all' ? true : t === typeFilter;
-    });
+      const data = [...lichThi].sort(sortByTime);
+      if(!sortedAsc) data.reverse();
 
-    // build table
-    let html = `
-      <table>
-        <thead>
-          <tr>
-            <th>Tên Giải</th>
-            <th>Thời Gian</th>
-            <th>Thể Loại</th>
-            <th>Trạng Thái</th>
-            <th>Link</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
+      const filtered = data.filter(e=>{
+        const t = (e.loai || '').trim() || 'unknown';
+        return typeFilter === 'all' ? true : t === typeFilter;
+      });
 
-    filtered.forEach(ctf=>{
-      const s = parseDateSafe(ctf.batDau);
-      const e = parseDateSafe(ctf.ketThuc);
-      const status = getStatus(s, e);
-      const timeText = (s && e) ? `${fmt.format(s)} → ${fmt.format(e)}`
-                                : `<span class="subtle">Chưa công bố</span>`;
-      const typeText = (ctf.loai && ctf.loai.trim()) ? ctf.loai : 'unknown';
-      const link = (ctf.link && ctf.link.trim()) ? ctf.link : '#';
-
-      html += `
-        <tr>
-          <td data-label="Tên Giải">
-            <div class="title">${ctf.ten}</div>
-          </td>
-          <td data-label="Thời Gian">
-            ${timeText}
-          </td>
-          <td data-label="Thể Loại">
-            <span class="type">${typeText}</span>
-          </td>
-          <td data-label="Trạng Thái">
-            <span class="status ${status.cls}">${status.label}</span>
-          </td>
-          <td data-label="Link">
-            <a class="link-btn" href="${link}" target="_blank" rel="noopener noreferrer">
-              🔗 Chi tiết
-            </a>
-          </td>
-        </tr>
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Tên Giải</th>
+              <th>Thời Gian</th>
+              <th>Thể Loại</th>
+              <th>Trạng Thái</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody>
       `;
-    });
 
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-  }
+      filtered.forEach(ctf=>{
+        const s = parseDateSafe(ctf.batDau);
+        const e = parseDateSafe(ctf.ketThuc);
+        const status = getStatus(s, e);
+        const timeText = (s && e) ? `${fmt.format(s)} → ${fmt.format(e)}`
+                                  : `<span class="subtle">Không rõ</span>`;
+        const typeText = (ctf.loai && ctf.loai.trim()) ? ctf.loai : 'unknown';
+        const link = (ctf.link && ctf.link.trim()) ? ctf.link : '#';
 
-  // ======== INTERACTIONS ========
-  document.getElementById('typeFilter').addEventListener('change', render);
-  document.getElementById('sortBtn').addEventListener('click', ()=>{
-    sortedAsc = !sortedAsc;
+        html += `
+          <tr>
+            <td data-label="Tên Giải"><div class="title">${ctf.ten}</div></td>
+            <td data-label="Thời Gian">${timeText}</td>
+            <td data-label="Thể Loại"><span class="type">${typeText}</span></td>
+            <td data-label="Trạng Thái"><span class="status ${status.cls}">${status.label}</span></td>
+            <td data-label="Link"><a class="link-btn" href="${link}" target="_blank" rel="noopener noreferrer">🔗 Chi tiết</a></td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    // ===== Controls =====
+    document.getElementById('typeFilter').addEventListener('change', render);
+    document.getElementById('sortBtn').addEventListener('click', ()=>{ sortedAsc = !sortedAsc; render(); });
+    document.getElementById('refreshBtn').addEventListener('click', ()=>{ render(); });
+
+    // ===== Boot =====
+    createMatrix();
+    createBloodDrops(70);
     render();
-  });
-
-  // theme toggle
-  const themeBtn = document.getElementById('themeBtn');
-  themeBtn.addEventListener('click', ()=>{
-    const root = document.body;
-    const cur = root.getAttribute('data-theme') || 'light';
-    root.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
-  });
-
-  // first paint
-  render();
   </script>
 </body>
 </html>
-
