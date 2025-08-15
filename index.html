@@ -199,7 +199,7 @@
     return isNaN(d.getTime()) ? null : d;
   }
   function getStatus(start, end){
-    if(!start || !end) return {label:'Chưa công bố', cls:'unknown'};
+    if(!start || !end) return {label:'Không rõ', cls:'unknown'};
     if(now < start) return {label:'Sắp diễn ra', cls:'upcoming'};
     if(now >= start && now <= end) return {label:'Đang diễn ra', cls:'ongoing'};
     return {label:'Đã kết thúc', cls:'finished'};
@@ -300,3 +300,4 @@
   </script>
 </body>
 </html>
+
